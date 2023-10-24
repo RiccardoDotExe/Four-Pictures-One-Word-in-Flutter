@@ -1,3 +1,3 @@
-# four_pictures_one_word
+# Four Pictures One Word in Flutter
 
-A new Flutter project.
+I tried recreating the app "four pictures one word" in flutter.
