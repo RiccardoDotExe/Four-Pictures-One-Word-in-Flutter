@@ -1,0 +1,23 @@
+name: four_pictures_one_word
+description: An attempt at recreating the app "4 pictures 1 word" in flutter
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.1.1 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_animate: ^4.2.0+1
+  shared_preferences: ^2.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
