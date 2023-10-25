@@ -1,95 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:four_pictures_one_word/game_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:four_pictures_one_word/provider/level_provider.dart';
+import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  int initialLevel;
+  HomeScreen({super.key, required this.initialLevel});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int levelIndex = 0;
-  bool isLoaded = false;
-  int maxLevel = 3; //hard coded right now but later flexible
+  bool firstLoad = false;
 
-  @override
-  void initState() {
-    loadIntFromPreferences();
-    super.initState();
-  }
-
-  Future<void> loadIntFromPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (!isLoaded) {
-      setState(() {
-        levelIndex =
-            prefs.getInt('level') ?? 0; // Default value 0 if 'key' is not found
-        isLoaded = true;
-      });
+  //to check if the screen is loaded for the first time
+  bool firstTimeLoaded() {
+    if (firstLoad == false) {
+      firstLoad = true;
+      return false;
     }
-  }
-
-  void clearIntPreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('level');
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return isLoaded
-        ? Scaffold(
-            appBar: AppBar(
-              title: const Text('4 pictures 1 word'),
-              centerTitle: true,
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text("Level: ${levelIndex + 1}"),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (levelIndex < maxLevel) {
-                        setState(() {
-                          isLoaded = false;
-                        });
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const GameScreen(),
-                            )).then((value) => loadIntFromPreferences());
-                      } else {
-                        winScreen();
-                      }
-                    },
-                    child: const Text("PLAY"),
-                  ),
-                  //Button for debugging
-                  ElevatedButton(
-                    onPressed: () {
-                      clearIntPreference();
-                      setState(() {
-                        levelIndex = 0;
-                      });
-                    },
-                    child: const Text('RESET'),
-                  ),
-                ],
+    return Consumer<LevelProvider>(
+        builder: (context, levelProvider, child) => Scaffold(
+              appBar: AppBar(
+                title: const Text('4 pictures 1 word'),
+                centerTitle: true,
               ),
-            ),
-          )
-        : const CircularProgressIndicator();
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                        "Level: ${firstTimeLoaded() ? levelProvider.getCurrentLevel + 1 : widget.initialLevel + 1}"),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (levelProvider.getCurrentLevel <
+                            levelProvider.maxLevel) {
+                          levelProvider.updateStage();
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(
+                                  builder: (context) => const GameScreen()))
+                              .then((value) => levelProvider.updateStage());
+                        } else {
+                          winScreen();
+                        }
+                      },
+                      child: const Text("PLAY"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        levelProvider.updateStage();
+                        levelProvider
+                            .updateLevel(levelProvider.getCurrentLevel + 1);
+                      },
+                      child: const Text('increase'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        levelProvider.clearLevel();
+                      },
+                      child: const Text('reset'),
+                    ),
+                  ],
+                ),
+              ),
+            ));
   }
 
   Future winScreen() => showDialog(
       context: context,
       builder: (context) => AlertDialog(
-            content: Text(
-                "You played through all $maxLevel levels. Wait for more to come. Congrats!"),
+            content: const Text(
+                "You played through all 3 levels. Wait for more to come. Congrats!"),
             actions: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
