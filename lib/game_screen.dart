@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:four_pictures_one_word/provider/level_provider.dart';
+import 'package:four_pictures_one_word/widgets/image_stack_widget.dart';
 import 'package:four_pictures_one_word/widgets/input_button_widget.dart';
 import 'package:four_pictures_one_word/widgets/solution_button_widget.dart';
 import 'package:provider/provider.dart';
@@ -14,23 +15,6 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   int shakeEffect = 0;
-
-  int _stackIndex = 1; //index for the stack of pictures
-  String displayImage = "assets/eis0.jpg"; //placeholder for the zoom in picture
-
-  //method to change from zoom in and out picture
-  void changeIndex(int newIndex) {
-    setState(() {
-      _stackIndex = newIndex;
-    });
-  }
-
-  //method to change the zoomed in picture
-  void changeImage(String newString) {
-    setState(() {
-      displayImage = newString;
-    });
-  }
 
   //used to generate the solution buttons
   List<Widget> generateSolutionButtons(int numberOfButtons) {
@@ -45,18 +29,6 @@ class _GameScreenState extends State<GameScreen> {
     return buttons;
   }
 
-  //used to generatea the clickable images
-  GestureDetector generateClickableImages(int index) {
-    return GestureDetector(
-      onTap: () {
-        changeIndex(0);
-        changeImage("assets/eis1.jpg"); //for the zoomed in picture
-      },
-      child: Image.asset("assets/eis1.jpg",
-          height: 100, width: 100, fit: BoxFit.fill),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<LevelProvider>(
@@ -69,38 +41,7 @@ class _GameScreenState extends State<GameScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    SizedBox(
-                      //Images
-                      width: 300.0,
-                      height: 300.0,
-                      child: IndexedStack(
-                        index: _stackIndex,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              changeIndex(1);
-                            },
-                            child: SizedBox(
-                              width: 300.0,
-                              height: 300.0,
-                              child: Image.asset(
-                                displayImage,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
-                          GridView.count(
-                            crossAxisCount: 2,
-                            children: <Widget>[
-                              generateClickableImages(0),
-                              generateClickableImages(1),
-                              generateClickableImages(2),
-                              generateClickableImages(3)
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    ImageStackWidget(stageName: levelProvider.stageName),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
