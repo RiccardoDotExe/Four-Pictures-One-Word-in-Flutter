@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:four_pictures_one_word/home_screen.dart';
+import 'package:four_pictures_one_word/screens/home_screen.dart';
 import 'package:four_pictures_one_word/provider/level_provider.dart';
 import 'package:four_pictures_one_word/sharedpreferences/shared_preference_helper.dart';
 import 'package:provider/provider.dart';

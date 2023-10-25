@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:four_pictures_one_word/game_screen.dart';
+import 'package:four_pictures_one_word/screens/game_screen.dart';
 import 'package:four_pictures_one_word/provider/level_provider.dart';
 import 'package:provider/provider.dart';
 
