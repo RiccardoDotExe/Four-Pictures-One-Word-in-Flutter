@@ -33,9 +33,40 @@ class _InputButtonWidgetState extends State<InputButtonWidget> {
           setState(() {
             levelProvider.addInputButton(widget.index);
           });
+          if (levelProvider.winScreen) {
+            levelProvider.winScreen = false;
+            winScreen();
+          }
         },
         child: Text(levelProvider.buttonLetters[widget.index]),
       ),
     );
   }
+
+  Future winScreen() => showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+            title: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("YOU WON!"),
+              ],
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); //out of pop up
+                        Navigator.pop(context); //out of game screen
+                      },
+                      child: const Text("go back to menu")),
+                ],
+              )
+            ],
+          ));
 }

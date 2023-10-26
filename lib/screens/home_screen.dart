@@ -55,6 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: const Text("PLAY"),
                     ),
+
+                    //for testing purposes
+                    /*
                     ElevatedButton(
                       onPressed: () {
                         levelProvider.updateStage();
@@ -69,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: const Text('reset'),
                     ),
+                    */
                   ],
                 ),
               ),

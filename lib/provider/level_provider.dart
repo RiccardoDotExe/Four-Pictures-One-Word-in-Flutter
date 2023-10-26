@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:four_pictures_one_word/sharedpreferences/shared_preference_helper.dart';
+import 'package:four_pictures_one_word/widgets/solution_button_widget.dart';
 
 class LevelProvider extends ChangeNotifier {
   late SharedPreferenceHelper _sharedPrefsHelper;
@@ -7,6 +8,9 @@ class LevelProvider extends ChangeNotifier {
   //level provider
   late int _currentLevel = 0;
   final int _maxLevel = 3;
+
+  late bool winScreen = false;
+  int shakeEffect = 0;
 
   LevelProvider() {
     _sharedPrefsHelper = SharedPreferenceHelper();
@@ -78,6 +82,7 @@ class LevelProvider extends ChangeNotifier {
 
   void updateStage() {
     if (_currentLevel < levelSolutions.length) {
+      shakeEffect = 0;
       stageName = levelSolutions[_currentLevel].toLowerCase();
       visibilityOfButtons = List<bool>.filled(10, true);
       stageName = levelSolutions[_currentLevel];
@@ -89,6 +94,10 @@ class LevelProvider extends ChangeNotifier {
       }
       notifyListeners();
     }
+  }
+
+  void resetShakeEffect() {
+    shakeEffect = -1;
   }
 
   void removeInputButton(int buttonNumber) {
@@ -122,20 +131,17 @@ class LevelProvider extends ChangeNotifier {
       if (_currentLevel == levelSolutions.length - 1) {
         _currentLevel++;
         updateLevel(_currentLevel);
-
-        //winScreen();
+        resetShakeEffect();
+        winScreen = true;
       } else if (_currentLevel < levelSolutions.length - 1) {
         _currentLevel++;
         updateLevel(_currentLevel);
         updateStage();
+        resetShakeEffect();
       }
     } else {
-      //print("Wrong!");
-      //do shake effect
-      /*
-      setState(() {
-        shakeEffect = shakeEffect + 2;
-      });*/
+      shakeEffect = shakeEffect + 2;
+      //print(shakeEffect);
     }
     notifyListeners();
   }
@@ -157,5 +163,19 @@ class LevelProvider extends ChangeNotifier {
     }
 
     return true;
+  }
+
+  //used to generate the solution buttons
+  List<Widget> generateSolutionButtons() {
+    int numberOfButtons = solutionList.length;
+    List<Widget> buttons = [];
+    for (int i = 0; i < numberOfButtons; i++) {
+      //for space between buttons
+      if (i < numberOfButtons) {
+        buttons.add(SolutionButtonWidget(index: i));
+        buttons.add(const SizedBox(width: 5));
+      }
+    }
+    return buttons;
   }
 }
