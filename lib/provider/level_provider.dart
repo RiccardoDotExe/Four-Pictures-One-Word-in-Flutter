@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:four_pictures_one_word/sharedpreferences/shared_preference_helper.dart';
-import 'package:four_pictures_one_word/widgets/solution_button_widget.dart';
 
+//used for level data on device
+import 'package:four_pictures_one_word/sharedpreferences/shared_preference_helper.dart';
+
+//custom widgets
+import 'package:four_pictures_one_word/widgets/solution_button_widget.dart';
+import 'package:four_pictures_one_word/widgets/input_button_widget.dart';
+
+//ALL IN ONE PROVIDER FOR NOW MAYSBE SPLIT IT UP LATER
 class LevelProvider extends ChangeNotifier {
   late SharedPreferenceHelper _sharedPrefsHelper;
 
-  //level provider
+  //LEVEL PROVIDER
+  //level data
   late int _currentLevel = 0;
   final int _maxLevel = 3;
 
+  //used for triggering the win screen
   late bool winScreen = false;
-  int shakeEffect = 0;
 
+  //used for triggering the animation effect
+  int animationTrigger = 0;
+
+  //constructor
   LevelProvider() {
     _sharedPrefsHelper = SharedPreferenceHelper();
     _currentLevel = getCurrentLevel;
@@ -19,10 +30,12 @@ class LevelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  //gets the max level
   int get maxLevel {
     return _maxLevel;
   }
 
+  //gets the level from shared preference and sets the variable
   int get getCurrentLevel {
     _sharedPrefsHelper.getCurrentLevelFromSharedPreference.then((statusValue) {
       _currentLevel = statusValue;
@@ -30,29 +43,31 @@ class LevelProvider extends ChangeNotifier {
     return _currentLevel;
   }
 
+  //upadtes the level variable and shared preference with a value
   void updateLevel(int level) {
     _sharedPrefsHelper.changeLevel(level);
     _sharedPrefsHelper.getCurrentLevelFromSharedPreference.then((levelStatus) {
       _currentLevel = levelStatus;
     });
-
     notifyListeners();
   }
 
+  //clears the level variable and shared preference
   void clearLevel() {
     _sharedPrefsHelper.deleteLevel();
     _sharedPrefsHelper.getCurrentLevelFromSharedPreference.then((levelStatus) {
       _currentLevel = levelStatus;
     });
-
     notifyListeners();
   }
 
-  //button provider
+  //BUTTON PROVIDER
+  //data for the buttons
   String stageName = "EIS";
   List<int> solutionList = [];
   List<bool> buttonEnabledArray = [];
 
+  //list to handle the visibility of the input buttons
   List<bool> visibilityOfButtons = List<bool>.filled(10, true);
 
   //data with all solutions according to level
@@ -80,9 +95,10 @@ class LevelProvider extends ChangeNotifier {
     9: '0'
   };
 
+  //loads the stage data
   void updateStage() {
     if (_currentLevel < levelSolutions.length) {
-      shakeEffect = 0;
+      animationTrigger = 0;
       stageName = levelSolutions[_currentLevel].toLowerCase();
       visibilityOfButtons = List<bool>.filled(10, true);
       stageName = levelSolutions[_currentLevel];
@@ -96,10 +112,12 @@ class LevelProvider extends ChangeNotifier {
     }
   }
 
-  void resetShakeEffect() {
-    shakeEffect = -1;
+  //used to reset the animation effect
+  void resetAnimationEffect() {
+    animationTrigger = -1;
   }
 
+  //removes the input button from the solution
   void removeInputButton(int buttonNumber) {
     buttonEnabledArray[buttonNumber] = false;
     visibilityOfButtons[solutionList[buttonNumber]] = true;
@@ -107,6 +125,7 @@ class LevelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  //adds the input button to the solution
   void addInputButton(int buttonNumber) {
     int spot = checkAvailableSpot();
     if (spot == -1) {
@@ -121,31 +140,38 @@ class LevelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  //checks if the solution is correct
   void attemptCheck() {
+    //makes a string out of the solution list for the check
     String attempt = "";
     for (int i = 0; i < stageName.length; i++) {
       attempt = attempt + buttonLetters[solutionList[i]];
     }
+    //checks if the attempt is correct
     if (attempt == stageName) {
-      //print("Right!");
+      //checks if the level is the last level
       if (_currentLevel == levelSolutions.length - 1) {
         _currentLevel++;
         updateLevel(_currentLevel);
-        resetShakeEffect();
+        resetAnimationEffect();
         winScreen = true;
-      } else if (_currentLevel < levelSolutions.length - 1) {
+      }
+      //if is not the last level
+      else if (_currentLevel < levelSolutions.length - 1) {
         _currentLevel++;
         updateLevel(_currentLevel);
         updateStage();
-        resetShakeEffect();
+        resetAnimationEffect();
       }
-    } else {
-      shakeEffect = shakeEffect + 2;
-      //print(shakeEffect);
+    }
+    //play the animation because the attempt is wrong
+    else {
+      animationTrigger = animationTrigger + 2;
     }
     notifyListeners();
   }
 
+  //checks if there is an available spot in the solution list
   int checkAvailableSpot() {
     for (int i = 0; i < solutionList.length; i++) {
       if (solutionList[i] == -1) {
@@ -155,13 +181,13 @@ class LevelProvider extends ChangeNotifier {
     return -1;
   }
 
+  //checks if the solution list is full
   bool listFull() {
     for (int i = 0; i < solutionList.length; i++) {
       if (solutionList[i] == -1) {
         return false;
       }
     }
-
     return true;
   }
 
@@ -169,11 +195,26 @@ class LevelProvider extends ChangeNotifier {
   List<Widget> generateSolutionButtons() {
     int numberOfButtons = solutionList.length;
     List<Widget> buttons = [];
+    buttons.add(const SizedBox(width: 5));
     for (int i = 0; i < numberOfButtons; i++) {
-      //for space between buttons
       if (i < numberOfButtons) {
         buttons.add(SolutionButtonWidget(index: i));
+        //for space between buttons
         buttons.add(const SizedBox(width: 5));
+      }
+    }
+    return buttons;
+  }
+
+  //used to generate the input buttons
+  List<Widget> generateInputButtons(int start, int end) {
+    List<Widget> buttons = [];
+    buttons.add(const SizedBox(width: 10));
+    for (start; start < end; start++) {
+      if (start < end) {
+        buttons.add(InputButtonWidget(index: start));
+        //for space between buttons
+        buttons.add(const SizedBox(width: 10));
       }
     }
     return buttons;

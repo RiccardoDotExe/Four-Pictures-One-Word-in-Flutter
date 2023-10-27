@@ -27,7 +27,7 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
     });
   }
 
-  //used to generatea the clickable images
+  //used to generate the clickable images
   GestureDetector generateClickableImages(int index, String stageName) {
     return GestureDetector(
       onTap: () {
@@ -45,9 +45,11 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
     return SizedBox(
       width: 300.0,
       height: 300.0,
+      //indexed stack switches between one big picture and grid of pictures
       child: IndexedStack(
         index: _stackIndex,
         children: [
+          //zoomed in picture
           GestureDetector(
             onTap: () {
               changeIndex(1);
@@ -61,6 +63,7 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
               ),
             ),
           ),
+          //grid of pictures
           GridView.count(
             crossAxisCount: 2,
             children: <Widget>[

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:four_pictures_one_word/screens/home_screen.dart';
-import 'package:four_pictures_one_word/provider/level_provider.dart';
+
+//used for level data on device
 import 'package:four_pictures_one_word/sharedpreferences/shared_preference_helper.dart';
+
+//used for state management
 import 'package:provider/provider.dart';
+import 'package:four_pictures_one_word/provider/level_provider.dart';
+
+//home screen
+import 'package:four_pictures_one_word/screens/home_screen.dart';
 
 void main() => runApp(FourPicturesOneWordApp());
 
@@ -21,6 +27,7 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
+      //one provider for now but we can add more later
       providers: [
         ChangeNotifierProvider<LevelProvider>(
           create: (context) => LevelProvider(),
@@ -28,10 +35,11 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
       ],
       child: MaterialApp(
           home: FutureBuilder(
+        //wait for the data to be loaded from shared preferences
         future: _sharedPreferenceHelper.getCurrentLevelFromSharedPreference,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Show a loading screen while data is being fetched
+            // show a loading screen while data is being fetched
             return Scaffold(
               appBar: AppBar(
                 title: const Text('Loading Screen'),
@@ -41,7 +49,7 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
               ),
             );
           } else if (snapshot.hasError) {
-            // Handle error state
+            // handle error state
             return Scaffold(
               appBar: AppBar(
                 title: const Text('Error'),
@@ -51,7 +59,7 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
               ),
             );
           } else {
-            // Data has been loaded, show the main screen
+            // data has been loaded, show the main screen
             int currentLevel = snapshot.data as int;
             return HomeScreen(initialLevel: currentLevel);
           }
