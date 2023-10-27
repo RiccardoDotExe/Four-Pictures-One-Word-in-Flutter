@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:four_pictures_one_word/screens/game_screen.dart';
-import 'package:four_pictures_one_word/provider/level_provider.dart';
+
+//provider
 import 'package:provider/provider.dart';
+import 'package:four_pictures_one_word/provider/level_provider.dart';
+
+//game screen
+import 'package:four_pictures_one_word/screens/game_screen.dart';
 
 // ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
@@ -38,8 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
+                        //current level
                         "Level: ${firstTimeLoaded() ? levelProvider.getCurrentLevel + 1 : widget.initialLevel + 1}"),
                     const SizedBox(height: 20),
+                    //play button
                     ElevatedButton(
                       onPressed: () {
                         if (levelProvider.getCurrentLevel <
@@ -50,13 +56,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   builder: (context) => const GameScreen()))
                               .then((value) => levelProvider.updateStage());
                         } else {
-                          winScreen();
+                          winScreen(levelProvider);
                         }
                       },
                       child: const Text("PLAY"),
                     ),
 
-                    //for testing purposes
+                    //buttons for testing purposes
                     /*
                     ElevatedButton(
                       onPressed: () {
@@ -79,11 +85,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ));
   }
 
-  Future winScreen() => showDialog(
+  //pop up when the user plays through all levels
+  Future winScreen(LevelProvider levelProvider) => showDialog(
       context: context,
       builder: (context) => AlertDialog(
-            content: const Text(
-                "You played through all 3 levels. Wait for more to come. Congrats!"),
+            content: Text(
+                "You played through all ${levelProvider.maxLevel} levels. Wait for more to come. Congrats!"),
             actions: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
