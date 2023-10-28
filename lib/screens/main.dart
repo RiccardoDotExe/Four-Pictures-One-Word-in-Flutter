@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 //used for level data on device
 import 'package:four_pictures_one_word/sharedpreferences/shared_preference_helper.dart';
 
+//firestore database
+import 'package:firebase_core/firebase_core.dart';
+import 'package:four_pictures_one_word/firebase/firebase_options.dart';
+
 //used for state management
 import 'package:provider/provider.dart';
 import 'package:four_pictures_one_word/provider/level_provider.dart';
@@ -10,7 +14,12 @@ import 'package:four_pictures_one_word/provider/level_provider.dart';
 //home screen
 import 'package:four_pictures_one_word/screens/home_screen.dart';
 
-void main() => runApp(FourPicturesOneWordApp());
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  runApp(FourPicturesOneWordApp());
+}
 
 class FourPicturesOneWordApp extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
