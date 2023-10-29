@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+//helper class for shared preference
 class SharedPreferenceHelper {
   Future<SharedPreferences>? _sharedPreference;
   //name of the key

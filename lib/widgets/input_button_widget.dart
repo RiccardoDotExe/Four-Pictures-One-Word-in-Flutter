@@ -54,6 +54,7 @@ class _InputButtonWidgetState extends State<InputButtonWidget> {
   Future winScreen() => showDialog(
       context: context,
       barrierDismissible: false,
+      useRootNavigator: false,
       builder: (context) => AlertDialog(
             title: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -69,7 +70,7 @@ class _InputButtonWidgetState extends State<InputButtonWidget> {
                 children: [
                   ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context); //out of pop up
+                        Navigator.pop(context); //out of show dialog
                         Navigator.pop(context); //out of game screen
                       },
                       child: const Text("go back to menu")),

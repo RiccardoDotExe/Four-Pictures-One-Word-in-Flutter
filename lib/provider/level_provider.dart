@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:four_pictures_one_word/datatypes/level.dart';
+import 'package:four_pictures_one_word/data/database_helper.dart';
 
 //used for level data on device
-import 'package:four_pictures_one_word/sharedpreferences/shared_preference_helper.dart';
+import 'package:four_pictures_one_word/data/shared_preference_helper.dart';
 
 //custom widgets
 import 'package:four_pictures_one_word/widgets/solution_button_widget.dart';
@@ -10,11 +12,15 @@ import 'package:four_pictures_one_word/widgets/input_button_widget.dart';
 //ALL IN ONE PROVIDER FOR NOW MAYSBE SPLIT IT UP LATER
 class LevelProvider extends ChangeNotifier {
   late SharedPreferenceHelper _sharedPrefsHelper;
+  late DatabaseHelper _databaseHelper;
+
+  //for level data from firestore
+  late List<Level> levelList = [];
 
   //LEVEL PROVIDER
   //level data
   late int _currentLevel = 0;
-  final int _maxLevel = 3;
+  late int _maxLevel = 3; // gets updated when data is loaded
 
   //used for triggering the win screen
   late bool winScreen = false;
@@ -25,9 +31,28 @@ class LevelProvider extends ChangeNotifier {
   //constructor
   LevelProvider() {
     _sharedPrefsHelper = SharedPreferenceHelper();
+    _databaseHelper = DatabaseHelper();
+    initializeData();
     _currentLevel = getCurrentLevel;
     updateStage();
     notifyListeners();
+  }
+
+  //data with all solutions according to level
+  Map<int, dynamic> levelSolutions = {};
+
+  // data for input buttons
+  Map<int, dynamic> levelInputButtons = {};
+
+  //get data from database and load it into variables
+  Future initializeData() async {
+    await _databaseHelper.loadLevels();
+    levelList = await _databaseHelper.getLevels;
+    for (int i = 0; i < levelList.length; i++) {
+      levelSolutions[i] = levelList[i].name;
+      levelInputButtons[i] = levelList[i].inputButtons;
+    }
+    _maxLevel = levelSolutions.length;
   }
 
   //gets the max level
@@ -63,22 +88,12 @@ class LevelProvider extends ChangeNotifier {
 
   //BUTTON PROVIDER
   //data for the buttons
-  String stageName = "EIS";
+  String stageName = "";
   List<int> solutionList = [];
   List<bool> buttonEnabledArray = [];
 
   //list to handle the visibility of the input buttons
   List<bool> visibilityOfButtons = List<bool>.filled(10, true);
-
-  //data with all solutions according to level
-  final Map<int, dynamic> levelSolutions = {0: 'EIS', 1: 'TRINKEN', 2: 'LIEBE'};
-
-  // data for input buttons
-  final Map<int, dynamic> levelInputButtons = {
-    0: 'SLTEIAKREF',
-    1: 'NIRLOKMNET',
-    2: 'ILBPETEAFK'
-  };
 
   //live button key data: -1 for empty
   Map<int, dynamic> buttonLetters = {
