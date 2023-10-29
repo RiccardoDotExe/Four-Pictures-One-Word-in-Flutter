@@ -32,6 +32,13 @@ migrate_working_dir/
 .pub/
 /build/
 
+# firebase related
+/lib/firebase/
+/android/app/google-services.json
+
+#irrelevant folders for now
+ios/
+
 # Symbolication related
 app.*.symbols
 

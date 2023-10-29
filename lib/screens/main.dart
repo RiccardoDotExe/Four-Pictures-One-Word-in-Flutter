@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 //used for level data on device
-import 'package:four_pictures_one_word/sharedpreferences/shared_preference_helper.dart';
+import 'package:four_pictures_one_word/data/shared_preference_helper.dart';
+
+//firestore database
+import 'package:firebase_core/firebase_core.dart';
+import 'package:four_pictures_one_word/data/database_helper.dart';
+import 'package:four_pictures_one_word/firebase/firebase_options.dart';
 
 //used for state management
 import 'package:provider/provider.dart';
@@ -10,7 +15,13 @@ import 'package:four_pictures_one_word/provider/level_provider.dart';
 //home screen
 import 'package:four_pictures_one_word/screens/home_screen.dart';
 
-void main() => runApp(FourPicturesOneWordApp());
+Future main() async {
+  //wait for firebase to initialize
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  runApp(FourPicturesOneWordApp());
+}
 
 class FourPicturesOneWordApp extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
@@ -21,22 +32,12 @@ class FourPicturesOneWordApp extends StatefulWidget {
 }
 
 class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
-  final SharedPreferenceHelper _sharedPreferenceHelper =
-      SharedPreferenceHelper();
-
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      //one provider for now but we can add more later
-      providers: [
-        ChangeNotifierProvider<LevelProvider>(
-          create: (context) => LevelProvider(),
-        ),
-      ],
-      child: MaterialApp(
-          home: FutureBuilder(
-        //wait for the data to be loaded from shared preferences
-        future: _sharedPreferenceHelper.getCurrentLevelFromSharedPreference,
+    return MaterialApp(
+      home: FutureBuilder(
+        //wait for the data to be loaded
+        future: getData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // show a loading screen while data is being fetched
@@ -59,12 +60,33 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
               ),
             );
           } else {
-            // data has been loaded, show the main screen
+            // data has been loaded
             int currentLevel = snapshot.data as int;
-            return HomeScreen(initialLevel: currentLevel);
+            return MultiProvider(
+                //one provider for now but we can add more later
+                providers: [
+                  ChangeNotifierProvider<LevelProvider>(
+                    create: (context) => LevelProvider(),
+                  ),
+                ],
+                child: MaterialApp(
+                  home: HomeScreen(initialLevel: currentLevel),
+                ));
           }
         },
-      )),
+      ),
     );
+  }
+
+  //method to load data from database and shared preference
+  Future<int> getData() async {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    await databaseHelper.loadLevels();
+
+    SharedPreferenceHelper sharedPreferenceHelper = SharedPreferenceHelper();
+    int currentLevel =
+        await sharedPreferenceHelper.getCurrentLevelFromSharedPreference;
+
+    return currentLevel;
   }
 }
