@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:four_pictures_one_word/datatypes/button.dart';
 import 'package:four_pictures_one_word/datatypes/level.dart';
 import 'package:four_pictures_one_word/data/database_helper.dart';
 
@@ -49,8 +50,8 @@ class LevelProvider extends ChangeNotifier {
     await _databaseHelper.loadLevels();
     levelList = await _databaseHelper.getLevels;
     for (int i = 0; i < levelList.length; i++) {
-      levelSolutions[i] = levelList[i].name;
-      levelInputButtons[i] = levelList[i].inputButtons;
+      levelSolutions[i] = levelList[i].name.toLowerCase();
+      levelInputButtons[i] = levelList[i].inputButtons.toLowerCase();
     }
     _maxLevel = levelSolutions.length;
   }
@@ -89,42 +90,52 @@ class LevelProvider extends ChangeNotifier {
   //BUTTON PROVIDER
   //data for the buttons
   String stageName = "";
-  List<int> solutionList = [];
-  List<bool> buttonEnabledArray = [];
-
-  //list to handle the visibility of the input buttons
-  List<bool> visibilityOfButtons = List<bool>.filled(10, true);
-
-  //live button key data: -1 for empty
-  Map<int, dynamic> buttonLetters = {
-    -1: '',
-    0: '0',
-    1: '0',
-    2: '0',
-    3: '0',
-    4: '0',
-    5: '0',
-    6: '0',
-    7: '0',
-    8: '0',
-    9: '0'
-  };
+  List<Button> solutionList = [];
+  List<Button> buttonList = [];
 
   //loads the stage data
   void updateStage() {
     if (_currentLevel < levelSolutions.length) {
       animationTrigger = 0;
       stageName = levelSolutions[_currentLevel].toLowerCase();
-      visibilityOfButtons = List<bool>.filled(10, true);
-      stageName = levelSolutions[_currentLevel];
-      solutionList = List<int>.filled(stageName.length, -1);
-      buttonEnabledArray = List<bool>.filled(stageName.length, false);
-      String buttonText = levelInputButtons[_currentLevel];
+
+      solutionList = [];
+      solutionList = List<Button>.filled(
+          stageName.length,
+          Button(
+            id: -1,
+            letter: '',
+            usedCurrently: false,
+            hinted: false,
+          ));
+
+      buttonList = [];
       for (int i = 0; i <= 9; i++) {
-        buttonLetters[i] = buttonText[i];
+        buttonList.add(Button(
+          id: i,
+          letter: levelInputButtons[_currentLevel][i],
+          usedCurrently: false,
+          hinted: false,
+        ));
       }
+
       notifyListeners();
     }
+  }
+
+  //hint function
+  //work in progress
+  void hintButton() {
+    bool hintFound = false;
+    for (int i = 0; i < solutionList.length; i++) {
+      if (solutionList[i].letter == stageName[i]) {
+      } else {
+        for (int j = 0; j < buttonList.length; j++) {
+          //HINT LOGIC
+        }
+      }
+    }
+    notifyListeners();
   }
 
   //used to reset the animation effect
@@ -133,21 +144,29 @@ class LevelProvider extends ChangeNotifier {
   }
 
   //removes the input button from the solution
-  void removeInputButton(int buttonNumber) {
-    buttonEnabledArray[buttonNumber] = false;
-    visibilityOfButtons[solutionList[buttonNumber]] = true;
-    solutionList[buttonNumber] = -1;
+  void removeInputButton(int buttonNumber, int solutionNumber) {
+    buttonList[buttonNumber].usedCurrently = false;
+    solutionList[solutionNumber] = Button(
+      id: -1,
+      letter: '',
+      usedCurrently: false,
+      hinted: false,
+    );
     notifyListeners();
   }
 
   //adds the input button to the solution
-  void addInputButton(int buttonNumber) {
-    int spot = checkAvailableSpot();
+  void addInputButton(int buttonNumber, int buttonSpot) {
+    int spot = 0;
+    if (buttonSpot == -1) {
+      spot = checkAvailableSpot();
+    } else {
+      spot = buttonSpot;
+    }
     if (spot == -1) {
     } else {
-      solutionList[spot] = buttonNumber;
-      buttonEnabledArray[spot] = true;
-      visibilityOfButtons[buttonNumber] = false;
+      solutionList[spot] = buttonList[buttonNumber];
+      buttonList[buttonNumber].usedCurrently = true;
       if (listFull()) {
         attemptCheck();
       }
@@ -160,7 +179,7 @@ class LevelProvider extends ChangeNotifier {
     //makes a string out of the solution list for the check
     String attempt = "";
     for (int i = 0; i < stageName.length; i++) {
-      attempt = attempt + buttonLetters[solutionList[i]];
+      attempt = attempt + solutionList[i].letter.toLowerCase();
     }
     //checks if the attempt is correct
     if (attempt == stageName) {
@@ -189,7 +208,7 @@ class LevelProvider extends ChangeNotifier {
   //checks if there is an available spot in the solution list
   int checkAvailableSpot() {
     for (int i = 0; i < solutionList.length; i++) {
-      if (solutionList[i] == -1) {
+      if (solutionList[i].id == -1) {
         return i;
       }
     }
@@ -199,7 +218,7 @@ class LevelProvider extends ChangeNotifier {
   //checks if the solution list is full
   bool listFull() {
     for (int i = 0; i < solutionList.length; i++) {
-      if (solutionList[i] == -1) {
+      if (solutionList[i].id == -1) {
         return false;
       }
     }
@@ -222,7 +241,7 @@ class LevelProvider extends ChangeNotifier {
   }
 
   //used to generate the input buttons
-  List<Widget> generateInputButtons(int start, int end) {
+  List<Widget> generateInputButtons(int start, int end, Widget widget) {
     List<Widget> buttons = [];
     buttons.add(const SizedBox(width: 10));
     for (start; start < end; start++) {
@@ -232,6 +251,8 @@ class LevelProvider extends ChangeNotifier {
         buttons.add(const SizedBox(width: 10));
       }
     }
+    buttons.add(widget);
+    buttons.add(const SizedBox(width: 10));
     return buttons;
   }
 }

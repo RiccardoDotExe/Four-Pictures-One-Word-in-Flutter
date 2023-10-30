@@ -8,6 +8,7 @@ import 'package:four_pictures_one_word/provider/level_provider.dart';
 import 'package:four_pictures_one_word/widgets/center_row.dart';
 import 'package:four_pictures_one_word/widgets/animated_row.dart';
 import 'package:four_pictures_one_word/widgets/image_stack_widget.dart';
+import 'package:four_pictures_one_word/widgets/hint_button_widget.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -38,10 +39,12 @@ class _GameScreenState extends State<GameScreen> {
                         AnimatedSolutionRow(),
                         const SizedBox(height: 20),
                         CustomCenterRow(
-                            widgets: levelProvider.generateInputButtons(0, 5)),
+                            widgets: levelProvider.generateInputButtons(
+                                0, 5, HintButtonWidget())),
                         const SizedBox(height: 10),
                         CustomCenterRow(
-                            widgets: levelProvider.generateInputButtons(5, 10)),
+                            widgets: levelProvider.generateInputButtons(
+                                5, 10, HintButtonWidget())),
                       ],
                     ),
                   ),

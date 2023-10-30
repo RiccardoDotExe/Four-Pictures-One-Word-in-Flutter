@@ -4,50 +4,42 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:four_pictures_one_word/provider/level_provider.dart';
 
-class InputButtonWidget extends StatefulWidget {
-  final int index;
-
+class HintButtonWidget extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
-  InputButtonWidget({super.key, required this.index});
+  HintButtonWidget({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _InputButtonWidgetState createState() => _InputButtonWidgetState();
+  _HintButtonWidgetState createState() => _HintButtonWidgetState();
 }
 
-class _InputButtonWidgetState extends State<InputButtonWidget> {
+class _HintButtonWidgetState extends State<HintButtonWidget> {
   //button style
   final ButtonStyle inputStyle = ElevatedButton.styleFrom(
       textStyle: const TextStyle(fontSize: 16),
       minimumSize: const Size(50, 50),
-      maximumSize: const Size(50, 50));
+      maximumSize: const Size(50, 50),
+      backgroundColor: Colors.green);
 
   @override
   Widget build(BuildContext context) {
     LevelProvider levelProvider = Provider.of<LevelProvider>(context);
-    //visibility widget to turn on and off the buttons
-    return Visibility(
-      maintainSize: true,
-      maintainAnimation: true,
-      maintainState: true,
-      //checks with the index to see if the button should be visible
-      visible: !(levelProvider.buttonList[widget.index].usedCurrently),
-      child: ElevatedButton(
-        style: inputStyle,
-        onPressed: () {
-          setState(() {
-            levelProvider.addInputButton(widget.index, -1);
-          });
-          //checks if the win screen should be triggered
-          if (levelProvider.winScreen) {
-            levelProvider.winScreen = false;
-            winScreen();
-          }
-        },
-        //gets the letter from the provider
-        child:
-            Text(levelProvider.buttonList[widget.index].letter.toUpperCase()),
-      ),
+
+    //hint button
+    return ElevatedButton(
+      style: inputStyle,
+      onPressed: () {
+        setState(() {
+          levelProvider.hintButton();
+        });
+        //checks if the win screen should be triggered
+        if (levelProvider.winScreen) {
+          levelProvider.winScreen = false;
+          winScreen();
+        }
+      },
+      //later maybe an icon instead of text
+      child: const Text("H"),
     );
   }
 
