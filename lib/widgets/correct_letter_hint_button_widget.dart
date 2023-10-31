@@ -4,49 +4,62 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:four_pictures_one_word/provider/level_provider.dart';
 
-class InputButtonWidget extends StatefulWidget {
-  final int index;
-
+class CorrectLetterHintButtonWidget extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
-  InputButtonWidget({super.key, required this.index});
+  CorrectLetterHintButtonWidget({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _InputButtonWidgetState createState() => _InputButtonWidgetState();
+  _CorrectLetterHintButtonWidgetState createState() =>
+      _CorrectLetterHintButtonWidgetState();
 }
 
-class _InputButtonWidgetState extends State<InputButtonWidget> {
+class _CorrectLetterHintButtonWidgetState
+    extends State<CorrectLetterHintButtonWidget> {
   //button style
   final ButtonStyle inputStyle = ElevatedButton.styleFrom(
       textStyle: const TextStyle(fontSize: 16),
       minimumSize: const Size(50, 50),
-      maximumSize: const Size(50, 50));
+      maximumSize: const Size(50, 50),
+      backgroundColor: Colors.green);
 
   @override
   Widget build(BuildContext context) {
     LevelProvider levelProvider = Provider.of<LevelProvider>(context);
-    //visibility widget to turn on and off the buttons
-    return Visibility(
-      maintainSize: true,
-      maintainAnimation: true,
-      maintainState: true,
-      //checks with the index to see if the button should be visible
-      visible: !(levelProvider.buttonList[widget.index].usedCurrently),
-      child: ElevatedButton(
-        style: inputStyle,
-        onPressed: () {
+
+    //hint button
+    return ElevatedButton(
+      style: inputStyle,
+      onPressed: () {
+        //not enough money
+        if (levelProvider.correctLetterCost > levelProvider.getCurrentMoney) {
+          levelProvider.moneyScreen(context);
+        } else {
           setState(() {
-            levelProvider.addInputButton(widget.index);
+            //set one correct letter in order
+            levelProvider.correctLetterHintButton();
+            levelProvider.updateMoney(levelProvider.getCurrentMoney -
+                levelProvider.correctLetterCost);
           });
-          //checks if the win screen should be triggered
-          if (levelProvider.winScreen) {
-            levelProvider.winScreen = false;
-            winScreen();
-          }
-        },
-        //gets the letter from the provider
-        child:
-            Text(levelProvider.buttonList[widget.index].letter.toUpperCase()),
+        }
+        //checks if the win screen should be triggered
+        if (levelProvider.winScreen) {
+          levelProvider.winScreen = false;
+          winScreen();
+        }
+      },
+      //icon and cost
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.lightbulb, size: 17),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text("${levelProvider.correctLetterCost}",
+                  style: const TextStyle(fontSize: 15))
+            ]),
+          ],
+        ),
       ),
     );
   }

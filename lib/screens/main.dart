@@ -32,6 +32,8 @@ class FourPicturesOneWordApp extends StatefulWidget {
 }
 
 class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
+  int currentLevel = 0;
+  int currentCurrency = 0;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -61,7 +63,6 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
             );
           } else {
             // data has been loaded
-            int currentLevel = snapshot.data as int;
             return MultiProvider(
                 //one provider for now but we can add more later
                 providers: [
@@ -70,7 +71,10 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
                   ),
                 ],
                 child: MaterialApp(
-                  home: HomeScreen(initialLevel: currentLevel),
+                  home: HomeScreen(
+                    initialLevel: currentLevel,
+                    initialCurrency: currentCurrency,
+                  ),
                 ));
           }
         },
@@ -84,8 +88,10 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
     await databaseHelper.loadLevels();
 
     SharedPreferenceHelper sharedPreferenceHelper = SharedPreferenceHelper();
-    int currentLevel =
+    currentLevel =
         await sharedPreferenceHelper.getCurrentLevelFromSharedPreference;
+    currentCurrency =
+        await sharedPreferenceHelper.getCurrentCurrencyFromSharedPreference;
 
     return currentLevel;
   }

@@ -10,19 +10,22 @@ import 'package:four_pictures_one_word/screens/game_screen.dart';
 // ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
   int initialLevel;
-  HomeScreen({super.key, required this.initialLevel});
+  int initialCurrency;
+
+  HomeScreen(
+      {super.key, required this.initialLevel, required this.initialCurrency});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool firstLoad = false;
+  int firstLoad = 0;
 
   //to check if the screen is loaded for the first time
   bool firstTimeLoaded() {
-    if (firstLoad == false) {
-      firstLoad = true;
+    if (firstLoad <= 1) {
+      firstLoad += 1;
       return false;
     }
     return true;
@@ -35,6 +38,20 @@ class _HomeScreenState extends State<HomeScreen> {
               appBar: AppBar(
                 title: const Text('4 pictures 1 word'),
                 centerTitle: true,
+                actions: [
+                  IconButton(
+                      onPressed: () {
+                        levelProvider.moneyScreen(context);
+                      },
+                      icon: const Icon(Icons.money),
+                      tooltip: "Coins"),
+                  Center(
+                      child: Text(
+                          "${firstTimeLoaded() ? levelProvider.getCurrentMoney : widget.initialCurrency}")),
+                  Container(
+                    width: 25,
+                  )
+                ],
               ),
               body: Center(
                 child: Column(
@@ -70,13 +87,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         levelProvider
                             .updateLevel(levelProvider.getCurrentLevel + 1);
                       },
-                      child: const Text('increase'),
+                      child: const Text('increase level'),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         levelProvider.clearLevel();
                       },
-                      child: const Text('reset'),
+                      child: const Text('reset level'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        levelProvider
+                            .updateMoney(levelProvider.getCurrentMoney + 100);
+                      },
+                      child: const Text('increase money'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        levelProvider.updateMoney(0);
+                      },
+                      child: const Text('reset money'),
                     ),
                     */
                   ],
