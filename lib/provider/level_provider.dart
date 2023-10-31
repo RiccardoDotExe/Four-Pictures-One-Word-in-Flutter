@@ -25,6 +25,7 @@ class LevelProvider extends ChangeNotifier {
 
   //used for triggering the win screen
   late bool winScreen = false;
+  bool clearJokerUsed = false;
 
   //used for triggering the animation effect
   int animationTrigger = 0;
@@ -34,6 +35,7 @@ class LevelProvider extends ChangeNotifier {
     _sharedPrefsHelper = SharedPreferenceHelper();
     _databaseHelper = DatabaseHelper();
     initializeData();
+    _money = getCurrentMoney;
     _currentLevel = getCurrentLevel;
     updateStage();
     notifyListeners();
@@ -63,8 +65,8 @@ class LevelProvider extends ChangeNotifier {
 
   //gets the level from shared preference and sets the variable
   int get getCurrentLevel {
-    _sharedPrefsHelper.getCurrentLevelFromSharedPreference.then((statusValue) {
-      _currentLevel = statusValue;
+    _sharedPrefsHelper.getCurrentLevelFromSharedPreference.then((levelStatus) {
+      _currentLevel = levelStatus;
     });
     return _currentLevel;
   }
@@ -97,6 +99,7 @@ class LevelProvider extends ChangeNotifier {
   void updateStage() {
     if (_currentLevel < levelSolutions.length) {
       animationTrigger = 0;
+      clearJokerUsed = false;
       stageName = levelSolutions[_currentLevel].toLowerCase();
 
       solutionList = [];
@@ -108,6 +111,7 @@ class LevelProvider extends ChangeNotifier {
             letter: '',
             usedCurrently: false,
             hinted: false,
+            clearedByJoker: false,
           ));
 
       buttonList = [];
@@ -118,6 +122,7 @@ class LevelProvider extends ChangeNotifier {
           letter: levelInputButtons[_currentLevel][i],
           usedCurrently: false,
           hinted: false,
+          clearedByJoker: false,
         ));
       }
 
@@ -125,8 +130,8 @@ class LevelProvider extends ChangeNotifier {
     }
   }
 
-  //hint function
-  void hintButton() {
+  //add correct letter hint function
+  void correctLetterHintButton() {
     bool hintFound = false;
     //loop over solution to find first wrong letter
     for (int i = 0; i < solutionList.length; i++) {
@@ -139,6 +144,7 @@ class LevelProvider extends ChangeNotifier {
         for (int j = 0; j < buttonList.length; j++) {
           if (!buttonList[j].usedCurrently &&
               !buttonList[j].hinted &&
+              !buttonList[j].clearedByJoker &&
               !hintFound) {
             if (buttonList[j].letter == stageName[i]) {
               //remove button in wrong spot
@@ -157,6 +163,7 @@ class LevelProvider extends ChangeNotifier {
         for (int j = 0; j < buttonList.length; j++) {
           if (buttonList[j].usedCurrently &&
               !buttonList[j].hinted &&
+              !buttonList[j].clearedByJoker &&
               !hintFound) {
             if (buttonList[j].letter == stageName[i]) {
               //remove button in wrong spot
@@ -177,6 +184,35 @@ class LevelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  //clear wrong letters hint function
+  void clearAllWrongButtons() {
+    List<int> rightButtons = [];
+    //add right buttons to the rightButtons list
+    for (int i = 0; i < stageName.length; i++) {
+      for (int j = 0; j < buttonList.length; j++) {
+        if (buttonList[j].letter == stageName[i] && !rightButtons.contains(j)) {
+          rightButtons.add(j);
+          break;
+        }
+      }
+    }
+    //remove buttons from the solution if they are not hinted
+    for (int i = 0; i < stageName.length; i++) {
+      if (!(solutionList[i].buttonID == -1) && !solutionList[i].hinted) {
+        removeInputButton(solutionList[i].buttonID, i);
+      }
+    }
+    //at the end makes wrong buttons invisible
+    for (int i = 0; i < buttonList.length; i++) {
+      if (!rightButtons.contains(i)) {
+        buttonList[i].clearedByJoker = true;
+        buttonList[i].usedCurrently = true;
+      }
+    }
+    clearJokerUsed = true;
+    notifyListeners();
+  }
+
   //used to reset the animation effect
   void resetAnimationEffect() {
     animationTrigger = -1;
@@ -192,6 +228,7 @@ class LevelProvider extends ChangeNotifier {
       letter: '',
       usedCurrently: false,
       hinted: false,
+      clearedByJoker: false,
     );
     notifyListeners();
   }
@@ -223,6 +260,7 @@ class LevelProvider extends ChangeNotifier {
     if (attempt == stageName) {
       //checks if the level is the last level
       if (_currentLevel == levelSolutions.length - 1) {
+        updateMoney(getCurrentMoney + 30);
         _currentLevel++;
         updateLevel(_currentLevel);
         resetAnimationEffect();
@@ -230,6 +268,7 @@ class LevelProvider extends ChangeNotifier {
       }
       //if is not the last level
       else if (_currentLevel < levelSolutions.length - 1) {
+        updateMoney(getCurrentMoney + 30);
         _currentLevel++;
         updateLevel(_currentLevel);
         updateStage();
@@ -293,4 +332,67 @@ class LevelProvider extends ChangeNotifier {
     buttons.add(const SizedBox(width: 10));
     return buttons;
   }
+
+  //MONEY PROVIDER
+  late int _money = 100;
+  int correctLetterCost = 10;
+  int clearWrongLetterCost = 20;
+
+  //gets the level from shared preference and sets the variable
+  int get getCurrentMoney {
+    _sharedPrefsHelper.getCurrentCurrencyFromSharedPreference
+        .then((moneyStatus) {
+      _money = moneyStatus;
+    });
+    return _money;
+  }
+
+  //upadtes the level variable and shared preference with a value
+  void updateMoney(int money) {
+    _sharedPrefsHelper.changeCurrency(money);
+    _sharedPrefsHelper.getCurrentCurrencyFromSharedPreference
+        .then((moneyStatus) {
+      _money = moneyStatus;
+    });
+    notifyListeners();
+  }
+
+  //clears the level variable and shared preference
+  void clearMoney() {
+    _sharedPrefsHelper.deleteCurrency();
+    _sharedPrefsHelper.getCurrentLevelFromSharedPreference.then((moneyStatus) {
+      _money = moneyStatus;
+    });
+    notifyListeners();
+  }
+
+  //win screen
+  Future moneyScreen(BuildContext context) => showDialog(
+      context: context,
+      barrierDismissible: true,
+      useRootNavigator: false,
+      builder: (context) => AlertDialog(
+            title: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("buy more currency! "),
+              ],
+            ),
+            content: const Text("//add shop here"),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        //out of show dialog
+                        Navigator.pop(context); //out of game screen
+                      },
+                      child: const Text("go back")),
+                ],
+              )
+            ],
+          ));
 }

@@ -6,6 +6,7 @@ class Button {
   String letter;
   bool usedCurrently;
   bool hinted;
+  bool clearedByJoker;
 
   //constructor
   Button({
@@ -14,6 +15,7 @@ class Button {
     required this.letter,
     required this.usedCurrently,
     required this.hinted,
+    required this.clearedByJoker,
   });
 
   //converts the data to json
@@ -24,6 +26,7 @@ class Button {
       'name': letter,
       'usedCurrently': usedCurrently,
       'hinted': hinted,
+      'clearedByJoker': clearedByJoker,
     };
   }
 
@@ -35,11 +38,12 @@ class Button {
       letter: json['name'] as String,
       usedCurrently: json['usedCurrently'] as bool,
       hinted: json['hinted'] as bool,
+      clearedByJoker: json['clearedByJoker'] as bool,
     );
   }
 
   @override
   String toString() {
-    return 'Button{buttonID: $buttonID,  solutionID: $solutionID, letter: $letter, usedCurrently: $usedCurrently, hinted: $hinted}';
+    return 'Button{buttonID: $buttonID,  solutionID: $solutionID, letter: $letter, usedCurrently: $usedCurrently, hinted: $hinted, clearedByJoker: $clearedByJoker}';
   }
 }

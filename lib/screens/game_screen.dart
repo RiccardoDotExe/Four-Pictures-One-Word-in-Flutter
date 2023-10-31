@@ -8,7 +8,8 @@ import 'package:four_pictures_one_word/provider/level_provider.dart';
 import 'package:four_pictures_one_word/widgets/center_row.dart';
 import 'package:four_pictures_one_word/widgets/animated_row.dart';
 import 'package:four_pictures_one_word/widgets/image_stack_widget.dart';
-import 'package:four_pictures_one_word/widgets/hint_button_widget.dart';
+import 'package:four_pictures_one_word/widgets/correct_letter_hint_button_widget.dart';
+import 'package:four_pictures_one_word/widgets/clear_wrong_hint_button_widget.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -25,6 +26,18 @@ class _GameScreenState extends State<GameScreen> {
               appBar: AppBar(
                 title: Text("Level: ${levelProvider.getCurrentLevel + 1}"),
                 centerTitle: true,
+                actions: [
+                  IconButton(
+                      onPressed: () {
+                        levelProvider.moneyScreen(context);
+                      },
+                      icon: const Icon(Icons.money),
+                      tooltip: "Coins"),
+                  Center(child: Text("${levelProvider.getCurrentMoney}")),
+                  Container(
+                    width: 25,
+                  )
+                ],
               ),
               body: Center(
                 child: SizedBox(
@@ -40,11 +53,11 @@ class _GameScreenState extends State<GameScreen> {
                         const SizedBox(height: 20),
                         CustomCenterRow(
                             widgets: levelProvider.generateInputButtons(
-                                0, 5, HintButtonWidget())),
+                                0, 5, CorrectLetterHintButtonWidget())),
                         const SizedBox(height: 10),
                         CustomCenterRow(
                             widgets: levelProvider.generateInputButtons(
-                                5, 10, HintButtonWidget())),
+                                5, 10, ClearWrongHintButonWidget())),
                       ],
                     ),
                   ),

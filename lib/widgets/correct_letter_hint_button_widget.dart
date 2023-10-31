@@ -4,16 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:four_pictures_one_word/provider/level_provider.dart';
 
-class HintButtonWidget extends StatefulWidget {
+class CorrectLetterHintButtonWidget extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
-  HintButtonWidget({super.key});
+  CorrectLetterHintButtonWidget({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _HintButtonWidgetState createState() => _HintButtonWidgetState();
+  _CorrectLetterHintButtonWidgetState createState() =>
+      _CorrectLetterHintButtonWidgetState();
 }
 
-class _HintButtonWidgetState extends State<HintButtonWidget> {
+class _CorrectLetterHintButtonWidgetState
+    extends State<CorrectLetterHintButtonWidget> {
   //button style
   final ButtonStyle inputStyle = ElevatedButton.styleFrom(
       textStyle: const TextStyle(fontSize: 16),
@@ -29,17 +31,36 @@ class _HintButtonWidgetState extends State<HintButtonWidget> {
     return ElevatedButton(
       style: inputStyle,
       onPressed: () {
-        setState(() {
-          levelProvider.hintButton();
-        });
+        //not enough money
+        if (levelProvider.correctLetterCost > levelProvider.getCurrentMoney) {
+          levelProvider.moneyScreen(context);
+        } else {
+          setState(() {
+            //set one correct letter in order
+            levelProvider.correctLetterHintButton();
+            levelProvider.updateMoney(levelProvider.getCurrentMoney -
+                levelProvider.correctLetterCost);
+          });
+        }
         //checks if the win screen should be triggered
         if (levelProvider.winScreen) {
           levelProvider.winScreen = false;
           winScreen();
         }
       },
-      //later maybe an icon instead of text
-      child: const Text("H"),
+      //icon and cost
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.lightbulb, size: 17),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text("${levelProvider.correctLetterCost}",
+                  style: const TextStyle(fontSize: 15))
+            ]),
+          ],
+        ),
+      ),
     );
   }
 
