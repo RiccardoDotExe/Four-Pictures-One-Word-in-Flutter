@@ -103,7 +103,8 @@ class LevelProvider extends ChangeNotifier {
       solutionList = List<Button>.filled(
           stageName.length,
           Button(
-            id: -1,
+            buttonID: -1,
+            solutionID: -1,
             letter: '',
             usedCurrently: false,
             hinted: false,
@@ -112,7 +113,8 @@ class LevelProvider extends ChangeNotifier {
       buttonList = [];
       for (int i = 0; i <= 9; i++) {
         buttonList.add(Button(
-          id: i,
+          buttonID: i,
+          solutionID: -1,
           letter: levelInputButtons[_currentLevel][i],
           usedCurrently: false,
           hinted: false,
@@ -124,14 +126,51 @@ class LevelProvider extends ChangeNotifier {
   }
 
   //hint function
-  //work in progress
   void hintButton() {
     bool hintFound = false;
+    //loop over solution to find first wrong letter
     for (int i = 0; i < solutionList.length; i++) {
+      //if correct go to next
       if (solutionList[i].letter == stageName[i]) {
-      } else {
+      }
+      //else handle hint
+      else {
+        //for buttons in the input buttons
         for (int j = 0; j < buttonList.length; j++) {
-          //HINT LOGIC
+          if (!buttonList[j].usedCurrently &&
+              !buttonList[j].hinted &&
+              !hintFound) {
+            if (buttonList[j].letter == stageName[i]) {
+              //remove button in wrong spot
+              if (!(solutionList[i].buttonID == -1)) {
+                removeInputButton(solutionList[i].buttonID, i);
+              }
+              //add button to the right spot
+              buttonList[j].hinted = true;
+              addInputButton(j);
+              hintFound = true;
+              break;
+            }
+          }
+        }
+        //for buttons in the solution buttons
+        for (int j = 0; j < buttonList.length; j++) {
+          if (buttonList[j].usedCurrently &&
+              !buttonList[j].hinted &&
+              !hintFound) {
+            if (buttonList[j].letter == stageName[i]) {
+              //remove button in wrong spot
+              if (!(solutionList[i].buttonID == -1)) {
+                removeInputButton(solutionList[i].buttonID, i);
+              }
+              //remove correct button from wrong spot and then add it to the right spot
+              buttonList[j].hinted = true;
+              removeInputButton(j, buttonList[j].solutionID);
+              addInputButton(j);
+              hintFound = true;
+              break;
+            }
+          }
         }
       }
     }
@@ -146,8 +185,10 @@ class LevelProvider extends ChangeNotifier {
   //removes the input button from the solution
   void removeInputButton(int buttonNumber, int solutionNumber) {
     buttonList[buttonNumber].usedCurrently = false;
+    buttonList[buttonNumber].solutionID = -1;
     solutionList[solutionNumber] = Button(
-      id: -1,
+      buttonID: -1,
+      solutionID: -1,
       letter: '',
       usedCurrently: false,
       hinted: false,
@@ -156,17 +197,14 @@ class LevelProvider extends ChangeNotifier {
   }
 
   //adds the input button to the solution
-  void addInputButton(int buttonNumber, int buttonSpot) {
-    int spot = 0;
-    if (buttonSpot == -1) {
-      spot = checkAvailableSpot();
-    } else {
-      spot = buttonSpot;
-    }
+  void addInputButton(int buttonNumber) {
+    int spot = checkAvailableSpot();
+
     if (spot == -1) {
     } else {
       solutionList[spot] = buttonList[buttonNumber];
       buttonList[buttonNumber].usedCurrently = true;
+      buttonList[buttonNumber].solutionID = spot;
       if (listFull()) {
         attemptCheck();
       }
@@ -208,7 +246,7 @@ class LevelProvider extends ChangeNotifier {
   //checks if there is an available spot in the solution list
   int checkAvailableSpot() {
     for (int i = 0; i < solutionList.length; i++) {
-      if (solutionList[i].id == -1) {
+      if (solutionList[i].buttonID == -1) {
         return i;
       }
     }
@@ -218,7 +256,7 @@ class LevelProvider extends ChangeNotifier {
   //checks if the solution list is full
   bool listFull() {
     for (int i = 0; i < solutionList.length; i++) {
-      if (solutionList[i].id == -1) {
+      if (solutionList[i].buttonID == -1) {
         return false;
       }
     }

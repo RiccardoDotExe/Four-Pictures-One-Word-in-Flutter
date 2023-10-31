@@ -36,7 +36,7 @@ class _InputButtonWidgetState extends State<InputButtonWidget> {
         style: inputStyle,
         onPressed: () {
           setState(() {
-            levelProvider.addInputButton(widget.index, -1);
+            levelProvider.addInputButton(widget.index);
           });
           //checks if the win screen should be triggered
           if (levelProvider.winScreen) {

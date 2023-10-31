@@ -1,14 +1,16 @@
 //for the button data of the game
 class Button {
   //variables
-  int id;
+  int buttonID;
+  int solutionID;
   String letter;
   bool usedCurrently;
   bool hinted;
 
   //constructor
   Button({
-    required this.id,
+    required this.buttonID,
+    required this.solutionID,
     required this.letter,
     required this.usedCurrently,
     required this.hinted,
@@ -17,7 +19,8 @@ class Button {
   //converts the data to json
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'buttonID': buttonID,
+      'solutionID': solutionID,
       'name': letter,
       'usedCurrently': usedCurrently,
       'hinted': hinted,
@@ -27,7 +30,8 @@ class Button {
   //converts the json to data
   static Button fromJson(Map<String, dynamic> json) {
     return Button(
-      id: json['id'] as int,
+      buttonID: json['id'] as int,
+      solutionID: json['solutionID'] as int,
       letter: json['name'] as String,
       usedCurrently: json['usedCurrently'] as bool,
       hinted: json['hinted'] as bool,
@@ -36,6 +40,6 @@ class Button {
 
   @override
   String toString() {
-    return 'Button{id: $id, letter: $letter, usedCurrently: $usedCurrently, hinted: $hinted}';
+    return 'Button{buttonID: $buttonID,  solutionID: $solutionID, letter: $letter, usedCurrently: $usedCurrently, hinted: $hinted}';
   }
 }

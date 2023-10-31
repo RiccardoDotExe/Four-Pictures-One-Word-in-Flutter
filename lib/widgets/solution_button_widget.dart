@@ -37,10 +37,10 @@ class _SolutionButtonWidgetState extends State<SolutionButtonWidget> {
           ? hintedStyle
           : solutionStyle,
       //checks if the button is enabled and give it a function accordingly
-      onPressed: !(levelProvider.solutionList[widget.index].id == -1 ||
+      onPressed: !(levelProvider.solutionList[widget.index].buttonID == -1 ||
               levelProvider.solutionList[widget.index].hinted)
           ? () => levelProvider.removeInputButton(
-              levelProvider.solutionList[widget.index].id, widget.index)
+              levelProvider.solutionList[widget.index].buttonID, widget.index)
           : null,
       //gets the letter from the provider
       child:
