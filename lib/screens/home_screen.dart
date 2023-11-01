@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                         //current level
                         "Level: ${firstTimeLoaded() ? levelProvider.getCurrentLevel + 1 : widget.initialLevel + 1}"),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     //play button
                     ElevatedButton(
                       onPressed: () {

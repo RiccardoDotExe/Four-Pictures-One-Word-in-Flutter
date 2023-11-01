@@ -37,9 +37,9 @@ class _CorrectLetterHintButtonWidgetState
         } else {
           setState(() {
             //set one correct letter in order
-            levelProvider.correctLetterHintButton();
             levelProvider.updateMoney(levelProvider.getCurrentMoney -
                 levelProvider.correctLetterCost);
+            levelProvider.correctLetterHintButton();
           });
         }
         //checks if the win screen should be triggered

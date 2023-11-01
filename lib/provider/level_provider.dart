@@ -263,7 +263,7 @@ class LevelProvider extends ChangeNotifier {
     if (attempt == stageName) {
       //checks if the level is the last level
       if (_currentLevel == levelSolutions.length - 1) {
-        updateMoney(getCurrentMoney + 30);
+        updateMoney(getCurrentMoney + levelClearReward);
         _currentLevel++;
         updateLevel(_currentLevel);
         resetAnimationEffect();
@@ -271,8 +271,9 @@ class LevelProvider extends ChangeNotifier {
       }
       //if is not the last level
       else if (_currentLevel < levelSolutions.length - 1) {
-        updateMoney(getCurrentMoney + 30);
+        updateMoney(getCurrentMoney + levelClearReward);
         _currentLevel++;
+
         updateLevel(_currentLevel);
         updateStage();
         resetAnimationEffect();
@@ -338,6 +339,7 @@ class LevelProvider extends ChangeNotifier {
 
   //MONEY PROVIDER
   late int _money = 100;
+  int levelClearReward = 30;
   int correctLetterCost = 10;
   int clearWrongLetterCost = 20;
 
@@ -369,7 +371,7 @@ class LevelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  //win screen
+  //money buy screen
   Future moneyScreen(BuildContext context) => showDialog(
       context: context,
       barrierDismissible: true,

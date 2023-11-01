@@ -35,8 +35,16 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
         changeImage(
             "assets/${stageName.toLowerCase()}$index.jpg"); //for the zoomed in picture
       },
-      child: Image.asset("assets/${stageName.toLowerCase()}$index.jpg",
-          height: 100, width: 100, fit: BoxFit.fill),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          border: Border.all(width: 5, color: Colors.blue),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Image.asset("assets/${stageName.toLowerCase()}$index.jpg",
+            height: 100, width: 100, fit: BoxFit.fill),
+      ),
     );
   }
 
@@ -54,9 +62,13 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
             onTap: () {
               changeIndex(1);
             },
-            child: SizedBox(
-              width: 300.0,
-              height: 300.0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                border: Border.all(width: 5, color: Colors.blue),
+                borderRadius: BorderRadius.circular(5),
+              ),
               child: Image.asset(
                 _displayImage,
                 fit: BoxFit.fill,
@@ -66,6 +78,8 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
           //grid of pictures
           GridView.count(
             crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
             children: <Widget>[
               generateClickableImages(0, widget.stageName),
               generateClickableImages(1, widget.stageName),
