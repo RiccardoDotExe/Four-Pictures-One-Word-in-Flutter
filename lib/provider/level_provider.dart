@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+
+//datatypes
 import 'package:four_pictures_one_word/datatypes/button.dart';
 import 'package:four_pictures_one_word/datatypes/level.dart';
-import 'package:four_pictures_one_word/data/database_helper.dart';
 
 //used for level data on device
 import 'package:four_pictures_one_word/data/shared_preference_helper.dart';
+import 'package:four_pictures_one_word/data/database_helper.dart';
 
 //custom widgets
 import 'package:four_pictures_one_word/widgets/solution_button_widget.dart';
 import 'package:four_pictures_one_word/widgets/input_button_widget.dart';
+import 'package:four_pictures_one_word/widgets/money_tapper_widget.dart';
 
 //ALL IN ONE PROVIDER FOR NOW MAYSBE SPLIT IT UP LATER
 class LevelProvider extends ChangeNotifier {
@@ -372,14 +375,28 @@ class LevelProvider extends ChangeNotifier {
       barrierDismissible: true,
       useRootNavigator: false,
       builder: (context) => AlertDialog(
-            title: const Row(
+            title: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("buy more currency! "),
+                Text("You got $getCurrentMoney coins! Get more:"),
               ],
             ),
-            content: const Text("//add shop here"),
+            content: SizedBox(
+              height: MediaQuery.of(context).size.height * .4,
+              width: MediaQuery.of(context).size.width * .7,
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                children: [
+                  MoneyTapperWidget(moneyValue: 10),
+                  MoneyTapperWidget(moneyValue: 25),
+                  MoneyTapperWidget(moneyValue: 50),
+                  MoneyTapperWidget(moneyValue: 100)
+                ],
+              ),
+            ),
             actions: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

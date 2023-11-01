@@ -39,18 +39,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: const Text('4 pictures 1 word'),
                 centerTitle: true,
                 actions: [
-                  IconButton(
-                      onPressed: () {
+                  GestureDetector(
+                      onTap: () {
                         levelProvider.moneyScreen(context);
                       },
-                      icon: const Icon(Icons.money),
-                      tooltip: "Coins"),
-                  Center(
-                      child: Text(
-                          "${firstTimeLoaded() ? levelProvider.getCurrentMoney : widget.initialCurrency}")),
-                  Container(
-                    width: 25,
-                  )
+                      child: Row(
+                        children: [
+                          const Icon(Icons.money),
+                          const SizedBox(width: 5),
+                          Center(
+                              child: Text(
+                                  "${firstTimeLoaded() ? levelProvider.getCurrentMoney : widget.initialCurrency}")),
+                        ],
+                      )),
+                  Container(width: 25),
                 ],
               ),
               body: Center(
