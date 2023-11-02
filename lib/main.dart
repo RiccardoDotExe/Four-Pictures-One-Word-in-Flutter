@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
-//used for level data on device
-import 'package:four_pictures_one_word/data/shared_preference_helper.dart';
-
 //firestore database
 import 'package:firebase_core/firebase_core.dart';
 import 'package:four_pictures_one_word/data/database_helper.dart';
 import 'package:four_pictures_one_word/firebase/firebase_options.dart';
 
-//used for state management
-import 'package:provider/provider.dart';
-import 'package:four_pictures_one_word/provider/level_provider.dart';
+//getx
+import 'package:get_storage/get_storage.dart';
 
 //home screen
 import 'package:four_pictures_one_word/screens/home_screen.dart';
 
 Future main() async {
+  //wait for getxstorage to initialize
+  await GetStorage.init();
+
   //wait for firebase to initialize
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -32,8 +31,6 @@ class FourPicturesOneWordApp extends StatefulWidget {
 }
 
 class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
-  int currentLevel = 0;
-  int currentCurrency = 0;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -63,19 +60,9 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
             );
           } else {
             // data has been loaded
-            return MultiProvider(
-                //one provider for now but we can add more later
-                providers: [
-                  ChangeNotifierProvider<LevelProvider>(
-                    create: (context) => LevelProvider(),
-                  ),
-                ],
-                child: MaterialApp(
-                  home: HomeScreen(
-                    initialLevel: currentLevel,
-                    initialCurrency: currentCurrency,
-                  ),
-                ));
+            return MaterialApp(
+              home: HomeScreen(),
+            );
           }
         },
       ),
@@ -83,16 +70,8 @@ class _FourPicturesOneWordAppState extends State<FourPicturesOneWordApp> {
   }
 
   //method to load data from database and shared preference
-  Future<int> getData() async {
+  Future<void> getData() async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     await databaseHelper.loadLevels();
-
-    SharedPreferenceHelper sharedPreferenceHelper = SharedPreferenceHelper();
-    currentLevel =
-        await sharedPreferenceHelper.getCurrentLevelFromSharedPreference;
-    currentCurrency =
-        await sharedPreferenceHelper.getCurrentCurrencyFromSharedPreference;
-
-    return currentLevel;
   }
 }

@@ -14,6 +14,8 @@ dependencies:
   flutter_animate: ^4.2.0+1
   provider: ^6.0.5
   shared_preferences: ^2.2.2
+  get: ^4.6.6
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

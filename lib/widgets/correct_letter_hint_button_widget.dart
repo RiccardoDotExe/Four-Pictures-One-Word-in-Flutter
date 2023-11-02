@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
-//provider
-import 'package:provider/provider.dart';
-import 'package:four_pictures_one_word/provider/level_provider.dart';
+//getx
+import 'package:get/get.dart';
+
+//custom getx controller
+import 'package:four_pictures_one_word/getX/level_controller.dart';
+import 'package:four_pictures_one_word/getX/money_controller.dart';
 
 class CorrectLetterHintButtonWidget extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
@@ -25,26 +28,27 @@ class _CorrectLetterHintButtonWidgetState
 
   @override
   Widget build(BuildContext context) {
-    LevelProvider levelProvider = Provider.of<LevelProvider>(context);
-
+    final moneyController = Get.put(MoneyController());
+    final levelController = Get.put(LevelController());
     //hint button
     return ElevatedButton(
       style: inputStyle,
       onPressed: () {
         //not enough money
-        if (levelProvider.correctLetterCost > levelProvider.getCurrentMoney) {
-          levelProvider.moneyScreen(context);
+        if (moneyController.correctLetterCost >
+            moneyController.getCurrentCurrencyFromBox) {
+          moneyController.moneyScreen(context);
         } else {
           setState(() {
             //set one correct letter in order
-            levelProvider.correctLetterHintButton();
-            levelProvider.updateMoney(levelProvider.getCurrentMoney -
-                levelProvider.correctLetterCost);
+            moneyController.addCurrency(-moneyController.correctLetterCost);
+
+            levelController.correctLetterHintButton();
           });
         }
         //checks if the win screen should be triggered
-        if (levelProvider.winScreen) {
-          levelProvider.winScreen = false;
+        if (levelController.winScreen) {
+          levelController.winScreen = false;
           winScreen();
         }
       },
@@ -55,7 +59,7 @@ class _CorrectLetterHintButtonWidgetState
           children: [
             const Icon(Icons.lightbulb, size: 17),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text("${levelProvider.correctLetterCost}",
+              Text("${moneyController.correctLetterCost}",
                   style: const TextStyle(fontSize: 15))
             ]),
           ],
