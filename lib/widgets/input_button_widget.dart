@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-//provider
-import 'package:provider/provider.dart';
-import 'package:four_pictures_one_word/provider/level_provider.dart';
+//getx
+import 'package:get/get.dart';
+
+//custom getx controller
+import 'package:four_pictures_one_word/getX/level_controller.dart';
 
 class InputButtonWidget extends StatefulWidget {
   final int index;
@@ -24,29 +26,33 @@ class _InputButtonWidgetState extends State<InputButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
-    LevelProvider levelProvider = Provider.of<LevelProvider>(context);
+    final levelController = Get.put(LevelController());
     //visibility widget to turn on and off the buttons
-    return Visibility(
-      maintainSize: true,
-      maintainAnimation: true,
-      maintainState: true,
-      //checks with the index to see if the button should be visible
-      visible: !(levelProvider.buttonList[widget.index].usedCurrently),
-      child: ElevatedButton(
-        style: inputStyle,
-        onPressed: () {
-          setState(() {
-            levelProvider.addInputButton(widget.index);
-          });
-          //checks if the win screen should be triggered
-          if (levelProvider.winScreen) {
-            levelProvider.winScreen = false;
-            winScreen();
-          }
-        },
-        //gets the letter from the provider
-        child:
-            Text(levelProvider.buttonList[widget.index].letter.toUpperCase()),
+    return Obx(
+      () => Visibility(
+        maintainSize: true,
+        maintainAnimation: true,
+        maintainState: true,
+        //checks with the index to see if the button should be visible
+        visible:
+            (levelController.buttonList[widget.index].usedCurrently == false),
+        child: ElevatedButton(
+          style: inputStyle,
+          onPressed: () {
+            setState(() {
+              levelController.addInputButton(widget.index);
+            });
+            //checks if the win screen should be triggered
+            if (levelController.winScreen) {
+              levelController.winScreen = false;
+              winScreen();
+            }
+          },
+          //gets the letter from the provider
+          child: Text(
+            levelController.buttonList[widget.index].letter.toUpperCase(),
+          ),
+        ),
       ),
     );
   }
@@ -70,13 +76,30 @@ class _InputButtonWidgetState extends State<InputButtonWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context); //out of show dialog
-                        Navigator.pop(context); //out of game screen
-                      },
-                      child: const Text("go back to menu")),
+                    onPressed: () {
+                      Navigator.pop(context); //out of show dialog
+                      Navigator.pop(context); //out of game screen
+                    },
+                    child: const Text("go back to menu"),
+                  ),
                 ],
-              )
+              ),
             ],
           ));
+}
+
+//used to generate the input buttons
+List<Widget> generateInputButtons(int start, int end, Widget widget) {
+  List<Widget> buttons = [];
+  buttons.add(const SizedBox(width: 10));
+  for (start; start < end; start++) {
+    if (start < end) {
+      buttons.add(InputButtonWidget(index: start));
+      //for space between buttons
+      buttons.add(const SizedBox(width: 10));
+    }
+  }
+  buttons.add(widget);
+  buttons.add(const SizedBox(width: 10));
+  return buttons;
 }

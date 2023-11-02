@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-//provider
-import 'package:provider/provider.dart';
-import 'package:four_pictures_one_word/provider/level_provider.dart';
+//getx
+import 'package:get/get.dart';
+
+//custom getx controller
+import 'package:four_pictures_one_word/getX/money_controller.dart';
 
 // ignore: must_be_immutable
 class MoneyTapperWidget extends StatefulWidget {
@@ -21,11 +23,11 @@ class MoneyTapperWidget extends StatefulWidget {
 class _MoneyTapperWidgetState extends State<MoneyTapperWidget> {
   @override
   Widget build(BuildContext context) {
-    LevelProvider levelProvider = Provider.of<LevelProvider>(context);
+    final controller = Get.put(MoneyController());
+
     return GestureDetector(
       onTap: () {
-        levelProvider
-            .updateMoney(levelProvider.getCurrentMoney + widget.moneyValue);
+        controller.addCurrency(widget.moneyValue);
         Navigator.pop(context);
       },
       child: Container(

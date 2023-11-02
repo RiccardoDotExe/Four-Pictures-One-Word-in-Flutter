@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
+//getx
+import 'package:get/get.dart';
+
+//custom getx controller
+import 'package:four_pictures_one_word/getX/level_controller.dart';
+
 // ignore: must_be_immutable
 class ImageStackWidget extends StatefulWidget {
-  String stageName;
-  ImageStackWidget({super.key, required this.stageName});
+  // ignore: prefer_const_constructors_in_immutables
+  ImageStackWidget({super.key});
   @override
   State<ImageStackWidget> createState() => _ImageStackWidgetState();
 }
 
 class _ImageStackWidgetState extends State<ImageStackWidget> {
+  final levelController = Get.put(LevelController());
   int _stackIndex = 1; //index for the stack of pictures
   String _displayImage =
       "assets/eis0.jpg"; //placeholder for the zoom in picture
@@ -28,12 +35,12 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
   }
 
   //used to generate the clickable images
-  GestureDetector generateClickableImages(int index, String stageName) {
+  GestureDetector generateClickableImages(int index) {
     return GestureDetector(
       onTap: () {
         changeIndex(0);
         changeImage(
-            "assets/${stageName.toLowerCase()}$index.jpg"); //for the zoomed in picture
+            "assets/${levelController.stageName.toLowerCase()}$index.jpg"); //for the zoomed in picture
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -42,8 +49,17 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
           border: Border.all(width: 5, color: Colors.blue),
           borderRadius: BorderRadius.circular(5),
         ),
-        child: Image.asset("assets/${stageName.toLowerCase()}$index.jpg",
-            height: 100, width: 100, fit: BoxFit.fill),
+        child: Obx(
+          () => !(levelController.stageName.value == "")
+              ? Image.asset(
+                  "assets/${levelController.stageName.value.toLowerCase()}$index.jpg",
+                  fit: BoxFit.fill,
+                )
+              : Image.asset(
+                  "assets/work_in_progress.jpg",
+                  fit: BoxFit.fill,
+                ),
+        ),
       ),
     );
   }
@@ -81,10 +97,10 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
             children: <Widget>[
-              generateClickableImages(0, widget.stageName),
-              generateClickableImages(1, widget.stageName),
-              generateClickableImages(2, widget.stageName),
-              generateClickableImages(3, widget.stageName)
+              generateClickableImages(0),
+              generateClickableImages(1),
+              generateClickableImages(2),
+              generateClickableImages(3)
             ],
           ),
         ],
