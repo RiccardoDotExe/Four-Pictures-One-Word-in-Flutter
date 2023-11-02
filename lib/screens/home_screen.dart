@@ -66,36 +66,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ]),
             ),
-
-            //buttons for testing purposes
-            /*
             ElevatedButton(
               onPressed: () {
-                levelController.addLevel(1);
-                levelController.updateStage();
-              },
-              child: const Text('increase level'),
-            ),
-            ElevatedButton(
-              onPressed: () {
+                moneyController.changeCurrency(100);
                 levelController.deleteLevel();
                 levelController.updateStage();
               },
-              child: const Text('reset level'),
+              child: const Text('RESET'),
             ),
-            ElevatedButton(
-              onPressed: () {
-                moneyController.addCurrency(100);
-              },
-              child: const Text('increase money'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                moneyController.changeCurrency(0);
-              },
-              child: const Text('reset money'),
-            ),
-            */
           ],
         ),
       ),
