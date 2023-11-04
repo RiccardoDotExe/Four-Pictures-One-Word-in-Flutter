@@ -18,7 +18,7 @@ class _ImageStackWidgetState extends State<ImageStackWidget> {
   final levelController = Get.put(LevelController());
   int _stackIndex = 1; //index for the stack of pictures
   String _displayImage =
-      "assets/eis0.jpg"; //placeholder for the zoom in picture
+      "assets/work_in_progress.jpg"; //placeholder for the zoom in picture
 
   //method to change from zoom in and out picture
   void changeIndex(int newIndex) {

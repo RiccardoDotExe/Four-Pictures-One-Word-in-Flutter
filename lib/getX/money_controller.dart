@@ -88,7 +88,6 @@ class MoneyController extends GetxController {
                   children: [
                     ElevatedButton(
                         onPressed: () {
-                          //out of show dialog
                           Navigator.pop(context); //out of game screen
                         },
                         child: const Text("go back")),
